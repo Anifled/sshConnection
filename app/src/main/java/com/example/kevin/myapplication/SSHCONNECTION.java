@@ -17,7 +17,10 @@ public class SSHCONNECTION {
     private  String port="22";
     private  JSch jsch=null;
     private  Session session=null;
+    private  Channel channel=null;
     private ArrayList<String> msg=null;
+    private InputStream inputStream=null;
+    private OutputStream outputStream=null;
 
     void init(String user,String password,String host,String port){
         this.user=user;
@@ -73,17 +76,77 @@ public class SSHCONNECTION {
     }
 
     /**
+     * init an interactive shell
+     * @return
+     */
+    public void shellInit(){
+        try {
+            newSession();
+            channel=session.openChannel("shell");
+            channel.connect();
+            inputStream=channel.getInputStream();
+            outputStream=channel.getOutputStream();
+        }catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
+    /**
+     * end a shell
+     */
+    public void shellEnd() {
+        try {
+            inputStream.close();
+            outputStream.close();
+            channel.disconnect();
+            session.disconnect();
+            msg.clear();
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+    /**
+     *execute given command in a simulation shell
+     * @param command
+     */
+    public  ArrayList<String> shellCommand(String command) {
+        try {
+            outputStream.write((command+"\r\n").getBytes());
+            outputStream.write("exit\r\n".getBytes());
+            outputStream.flush();
+            byte[] tmp=new byte[1024];
+            while(true) {
+                while (inputStream.available() > 0) {
+                    int i = inputStream.read(tmp,0,1024);
+                    if (i < 0)
+                        break;
+                    msg.add(new String(tmp, 0, i));
+                }
+                if (channel.isClosed()) {
+                    if (inputStream.available() > 0) continue;
+                    msg.add("exit-status:"+channel.getExitStatus());
+                    break;
+                }
+            }
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+        return msg;
+    }
+
+    /**
      * control a channel connection with a specified command
+     * non-interactive mode
      * @param command
      * @return
      */
     public  ArrayList<String> connect(String command) {
         try {
             newSession();
-            //String ENV="export BASH_ENV=/home/kevin/.bashrc";
-            //dealOrder(session,ENV);
+            msg.clear();
             dealOrder(session,command);
-            //dealOrder(session,command);
             disconnectSession();
 
         } catch (Exception e ){
@@ -99,7 +162,7 @@ public class SSHCONNECTION {
      */
     private  void dealOrder(Session session, String command) {
         try {
-            Channel channel=session.openChannel("exec");
+            channel=session.openChannel("exec");
             ((ChannelExec)channel).setCommand(command);
             channel.setInputStream(null);
             ((ChannelExec)channel).setErrStream(System.err);

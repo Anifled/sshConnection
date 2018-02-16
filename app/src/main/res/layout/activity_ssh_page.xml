@@ -67,5 +67,13 @@
         android:layout_gravity="center"
         android:text="@string/connect"/>
 
+    <Button
+        android:id="@+id/shellConnectBtn"
+        android:layout_width="wrap_content"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:text="@string/connectShell"/>
+
 
 </LinearLayout>

@@ -3,9 +3,11 @@
     <string name="app_name">ssh连接</string>
     <string name="ip">请输入ip地址</string>
     <string name="port">请输入端口号</string>
-    <string name="connect">连接</string>
+    <string name="connect">连接(非登錄非交互)</string>
+    <string name="connectShell">连接(登錄且交互)</string>
     <string name="username">请输入用户名</string>
     <string name="psword">请输入密码</string>
+    <string name="shellCommand">请输入交互指令</string>
     <string name="exac">请输入想要执行的命令</string>
     <string name="send">发送命令</string>
 </resources>

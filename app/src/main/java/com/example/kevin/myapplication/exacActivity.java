@@ -21,13 +21,12 @@ public class exacActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exac);
         Intent intent=getIntent();
-        final String ip=intent.getStringExtra("ip");
-        final String port=intent.getStringExtra("port");
-        final String username=intent.getStringExtra("username");
-        final String password=intent.getStringExtra("password");
+        String ip=intent.getStringExtra("ip");
+        String port=intent.getStringExtra("port");
+        String username=intent.getStringExtra("username");
+        String password=intent.getStringExtra("password");
 
-
-        //Toast.makeText(getApplicationContext(),"ip:"+ip,Toast.LENGTH_SHORT);
+        sshconnection.init(username,password,ip,port);
 
         final EditText editCommand=findViewById(R.id.exac);
         Button send=findViewById(R.id.sendBtn);
@@ -38,7 +37,7 @@ public class exacActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final String command=editCommand.getText().toString();
-                sshconnection.init(username,password,ip,port);
+
                 try{
                     new Thread(new Runnable() {
                         @Override
